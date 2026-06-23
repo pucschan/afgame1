@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Intangible Assets</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #2c3e50;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: var(--secondary);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        h1, h2 {
+            color: var(--secondary);
+            text-align: center;
+        }
+
+        h1 { border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
+
+        .lesson-box {
+            background-color: #f0f7ff;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .card {
+            padding: 15px;
+            border-radius: 6px;
+            color: white;
+        }
+        .tangible-card { background-color: #95a5a6; }
+        .intangible-card { background-color: var(--primary); }
+
+        /* Game Styles */
+        #game-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: var(--secondary);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        #canvas-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+            border: 3px solid var(--secondary);
+            border-radius: 8px;
+            background: #222;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .target {
+            position: absolute;
+            width: 100px;
+            height: 40px;
+            background: #f1c40f;
+            border: 2px solid #f39c12;
+            border-radius: 20px;
+            color: #000;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            user-select: none;
+            transition: transform 0.1s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            padding: 2px;
+        }
+
+        .target:active {
+            transform: scale(0.9);
+        }
+
+        #start-btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 15px;
+        }
+
+        #start-btn:hover { background-color: #27ae60; }
+        #start-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        .game-over-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Understanding Intangible Assets</h1>
+    
+    <div class="lesson-box">
+        <p>An <strong>intangible asset</strong> is an asset that is not physical in nature. You cannot touch it, see it, or hold it, but it holds significant value for a business (often helping them generate revenue long-term).</p>
+        
+        <div class="grid">
+            <div class="card tangible-card">
+                <h3>Tangible Assets (Physical)</h3>
+                <ul>
+                    <li>Buildings & Factories</li>
+                    <li>Company Vehicles</li>
+                    <li>Computers & Office Furniture</li>
+                    <li>Cash & Inventory</li>
+                </ul>
+            </div>
+            <div class="card intangible-card">
+                <h3>Intangible Assets (Non-Physical)</h3>
+                <ul>
+                    <li><strong>Brand Reputation / Goodwill</strong></li>
+                    <li><strong>Copyrights & Patents</strong></li>
+                    <li><strong>Trademarks (Logos/Names)</strong></li>
+                    <li><strong>Proprietary Software & Code</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h2>Game: Intangible Asset Hunter</h2>
+    <p style="text-align: center;"><strong>Instructions:</strong> Targets are dropping! Shoot (click) <strong>ONLY the Intangible Assets</strong>. 
+    <br>🎯 Correct = +1 Mark | ❌ Wrong/Missed Target = -1 Mark. You have 1 minute!</p>
+
+    <div id="game-container">
+        <div class="game-stats">
+            <div>Time Left: <span id="timer">60</span>s</div>
+            <div>Score: <span id="score">0</span></div>
+        </div>
+
+        <div id="canvas-wrapper">
+            <div id="game-overlay" class="game-over-screen">
+                <h3 id="overlay-title">Ready to Test Your Knowledge?</h3>
+                <p id="overlay-desc">Click the button below to start the 1-minute challenge.</p>
+            </div>
+        </div>
+
+        <button id="start-btn" onclick="startGame()">Start Game</button>
+    </div>
+</div>
+
+<script>
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+    const scoreDisplay = document.getElementById('score');
+    const timerDisplay = document.getElementById('timer');
+    const startBtn = document.getElementById('start-btn');
+    const overlay = document.getElementById('game-overlay');
+    const overlayTitle = document.getElementById('overlay-title');
+    const overlayDesc = document.getElementById('overlay-desc');
+
+    let score = 0;
+    let timeLeft = 60;
+    let gameInterval;
+    let spawnInterval;
+    let isPlaying = false;
+
+    // Asset Pools
+    const intangibles = ['Patent', 'Copyright', 'Trademark', 'Brand Name', 'Goodwill', 'Software License', 'Trade Secret', 'Franchise Agreement'];
+    const tangibles = ['Building', 'Delivery Truck', 'Desktop PC', 'Cash', 'Office Chair', 'Inventory', 'Machinery', 'Land'];
+
+    function startGame() {
+        // Reset Stats
+        score = 0;
+        timeLeft = 60;
+        isPlaying = true;
+        scoreDisplay.textContent = score;
+        timerDisplay.textContent = timeLeft;
+        
+        // UI Adjustments
+        startBtn.disabled = true;
+        overlay.style.display = 'none';
+
+        // Clear any leftover targets
+        document.querySelectorAll('.target').forEach(el => el.remove());
+
+        // Game Loop Timers
+        gameInterval = setInterval(updateTimer, 1000);
+        spawnInterval = setInterval(spawnTarget, 900); // Spawns a target every 0.9 seconds
+    }
+
+    function updateTimer() {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            endGame();
+        }
+    }
+
+    function spawnTarget() {
+        if (!isPlaying) return;
+
+        const target = document.createElement('div');
+        target.classList.add('target');
+
+        // Determine randomly if it's tangible or intangible
+        const isIntangible = Math.random() < 0.5;
+        const word = isIntangible 
+            ? intangibles[Math.floor(Math.random() * intangibles.length)]
+            : tangibles[Math.floor(Math.random() * tangibles.length)];
+
+        target.textContent = word;
+        target.dataset.isIntangible = isIntangible;
+
+        // Random X position ensuring it stays completely within the box bounds
+        const wrapperWidth = canvasWrapper.clientWidth;
+        const randomX = Math.random() * (wrapperWidth - 110); 
+        target.style.left = randomX + 'px';
+        target.style.top = '0px';
+
+        canvasWrapper.appendChild(target);
+
+        // Falling physics mechanics
+        let currentY = 0;
+        const fallSpeed = 1.5 + Math.random() * 2; // Randomized fall speed for variety
+
+        function fall() {
+            if (!isPlaying) {
+                target.remove();
+                return;
+            }
+
+            currentY += fallSpeed;
+            target.style.top = currentY + 'px';
+
+            // Check if it reached the bottom
+            if (currentY > (canvasWrapper.clientHeight - 40)) {
+                // If student missed an INTANGIBLE asset, deduct a point
+                if (target.dataset.isIntangible === "true") {
+                    updateScore(-1);
+                }
+                target.remove();
+            } else {
+                requestAnimationFrame(fall);
+            }
+        }
+
+        // Attach Click Listener to Shoot
+        target.addEventListener('mousedown', (e) => {
+            e.stopPropagation(); // Stop click from triggering background misses
+            shootTarget(target);
+        });
+
+        requestAnimationFrame(fall);
+    }
+
+    function shootTarget(target) {
+        if (!isPlaying) return;
+
+        const isIntangible = target.dataset.isIntangible === "true";
+        
+        if (isIntangible) {
+            updateScore(1); // Right choice
+        } else {
+            updateScore(-1); // Wrong choice (shot a tangible asset)
+        }
+        
+        target.remove();
+    }
+
+    // Deduct 1 mark if user clicks the empty game canvas background
+    canvasWrapper.addEventListener('mousedown', () => {
+        if (!isPlaying) return;
+        updateScore(-1);
+    });
+
+    function updateScore(amount) {
+        score += amount;
+        scoreDisplay.textContent = score;
+    }
+
+    function endGame() {
+        isPlaying = false;
+        clearInterval(gameInterval);
+        clearInterval(spawnInterval);
+
+        // Remove active targets
+        document.querySelectorAll('.target').forEach(el => el.remove());
+
+        // Show Game Over overlay screen
+        overlayTitle.textContent = "Time's Up!";
+        overlayDesc.innerHTML = `Your Final Score: <strong>${score} Mark(s)</strong><br><br>` + 
+                                (score >= 15 ? "Excellent! You understand Intangible Assets perfectly!" : "Good effort! Review the study text above and try again.");
+        overlay.style.display = 'flex';
+        
+        startBtn.disabled = false;
+        startBtn.textContent = "Play Again";
+    }
+</script>
+
+</body>
+</html>
